@@ -1,0 +1,2430 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Presentasi SJF CPU Scheduling</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0f1117;
+        --surface: #1a1d27;
+        --surface-2: #222636;
+        --border: #2a2f45;
+        --text: #e8eaf0;
+        --muted: #8c95b5;
+        --accent: #5b7bff;
+        --accent-2: #a78bfa;
+        --success: #34d399;
+        --warning: #fbbf24;
+        --danger: #ef4444;
+        --radius-input: 8px;
+        --radius-card: 8px;
+        --radius-panel: 12px;
+        --font: "Inter", sans-serif;
+        --mono: "JetBrains Mono", monospace;
+        --max-w: 1040px;
+        --topbar-h: 60px;
+        --gantt-block-h: 48px;
+        --modal-max-w: 720px;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--font);
+        font-size: 15px;
+        line-height: 1.6;
+      }
+
+      body.modal-open {
+        overflow: hidden;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        height: var(--topbar-h);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 0 24px;
+        background: rgba(15, 17, 23, 0.9);
+        border-bottom: 1px solid var(--border);
+        backdrop-filter: blur(12px);
+      }
+
+      .topbar-logo {
+        flex: 0 0 auto;
+        color: var(--accent);
+        font-size: 18px;
+        font-weight: 700;
+      }
+
+      .topbar-logo span {
+        color: var(--text);
+      }
+
+      .topbar-nav {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .topbar-nav a {
+        position: relative;
+        display: inline-flex;
+        min-height: 36px;
+        align-items: center;
+        color: var(--muted);
+        border-radius: var(--radius-input);
+        padding: 8px 12px;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        transition:
+          color 0.2s,
+          background 0.2s;
+        white-space: nowrap;
+      }
+
+      .topbar-nav a:hover {
+        background: var(--surface-2);
+        color: var(--text);
+      }
+
+      .topbar-nav a.active {
+        color: var(--accent);
+      }
+
+      .topbar-nav a.active::after {
+        content: "";
+        position: absolute;
+        right: 12px;
+        bottom: 0;
+        left: 12px;
+        height: 2px;
+        border-radius: 999px;
+        background: var(--accent);
+      }
+
+      .topbar-indicator {
+        flex: 0 0 auto;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: var(--surface);
+        color: var(--muted);
+        padding: 4px 12px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .page {
+        display: none;
+        max-width: var(--max-w);
+        margin: 0 auto;
+        padding: 32px 24px 80px;
+        opacity: 0;
+        transition: opacity 150ms ease;
+      }
+
+      .page.visible {
+        display: block;
+      }
+
+      .page.fade-in {
+        opacity: 1;
+      }
+
+      h1 {
+        margin-bottom: 8px;
+        font-size: 38px;
+        font-weight: 700;
+        line-height: 1.2;
+      }
+
+      h2 {
+        margin-bottom: 16px;
+        font-size: 22px;
+        font-weight: 700;
+      }
+
+      h3 {
+        margin-bottom: 8px;
+        font-size: 17px;
+        font-weight: 700;
+      }
+
+      .subtitle {
+        max-width: 760px;
+        margin-bottom: 32px;
+        color: var(--muted);
+        font-size: 16px;
+      }
+
+      .card-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 32px;
+      }
+
+      .card,
+      .problem-card,
+      .sim-controls,
+      .stat-card,
+      .gantt-container,
+      .formula-box {
+        border: 1px solid var(--border);
+        background: var(--surface);
+      }
+
+      .card {
+        border-radius: var(--radius-card);
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .card h3 {
+        color: var(--accent);
+      }
+
+      .card p {
+        color: var(--muted);
+        font-size: 14px;
+        flex: 1 1 auto;
+      }
+
+      .card .btn-learn {
+        margin-top: 16px;
+        align-self: flex-start;
+      }
+
+      .formula-box {
+        margin-bottom: 32px;
+        border-radius: var(--radius-card);
+        padding: 20px 24px;
+        font-family: var(--mono);
+        font-size: 14px;
+        line-height: 2;
+      }
+
+      .formula-box .var {
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      .formula-box .eq {
+        color: var(--muted);
+      }
+
+      .styled-table {
+        width: 100%;
+        margin-bottom: 32px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-card);
+        border-collapse: collapse;
+        background: var(--surface);
+        font-size: 14px;
+      }
+
+      .styled-table th {
+        border-bottom: 1px solid var(--border);
+        background: var(--surface-2);
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+        padding: 10px 14px;
+        text-align: left;
+        text-transform: uppercase;
+      }
+
+      .styled-table td {
+        border-bottom: 1px solid rgba(42, 47, 69, 0.5);
+        font-family: var(--mono);
+        font-size: 13px;
+        padding: 10px 14px;
+      }
+
+      .styled-table tr:last-child td {
+        border-bottom: 0;
+      }
+
+      .comparison-table th:first-child,
+      .comparison-table td:first-child {
+        color: var(--accent-2);
+        font-weight: 700;
+      }
+
+      .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .section-header h2 {
+        margin-bottom: 0;
+      }
+
+      .sim-layout {
+        display: grid;
+        grid-template-columns: 380px minmax(0, 1fr);
+        gap: 24px;
+        align-items: start;
+      }
+
+      .sim-controls {
+        border-radius: var(--radius-panel);
+        padding: 20px;
+      }
+
+      .ctrl-group {
+        margin-bottom: 20px;
+      }
+
+      .ctrl-group label {
+        display: block;
+        margin-bottom: 6px;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .algo-selector {
+        display: flex;
+        gap: 8px;
+      }
+
+      .algo-card {
+        flex: 1;
+        min-height: 66px;
+        border: 2px solid var(--border);
+        border-radius: var(--radius-input);
+        background: var(--surface-2);
+        color: var(--muted);
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 700;
+        padding: 12px;
+        text-align: center;
+        transition:
+          border-color 0.2s,
+          color 0.2s,
+          background 0.2s;
+        user-select: none;
+      }
+
+      .algo-card:hover,
+      .algo-card.selected {
+        border-color: var(--accent);
+        color: var(--text);
+      }
+
+      .algo-card.selected {
+        background: rgba(91, 123, 255, 0.1);
+      }
+
+      .input-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+
+      .input-row input {
+        min-width: 0;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-input);
+        outline: 0;
+        background: var(--surface-2);
+        color: var(--text);
+        font-family: var(--mono);
+        font-size: 12px;
+        padding: 8px 10px;
+        transition: border-color 0.2s;
+      }
+
+      .input-row input:focus {
+        border-color: var(--accent);
+      }
+
+      .input-row input::placeholder {
+        color: var(--muted);
+        font-family: var(--font);
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        min-height: 34px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-input);
+        background: var(--surface-2);
+        color: var(--text);
+        cursor: pointer;
+        font-family: var(--font);
+        font-size: 13px;
+        font-weight: 700;
+        padding: 8px 14px;
+        transition:
+          background 0.2s,
+          border-color 0.2s;
+      }
+
+      .btn:hover {
+        background: var(--border);
+      }
+
+      .btn-primary {
+        border-color: var(--accent);
+        background: var(--accent);
+        color: #fff;
+      }
+
+      .btn-primary:hover {
+        background: #4a6ae6;
+      }
+
+      .btn-danger {
+        min-width: 28px;
+        min-height: 28px;
+        border-color: transparent;
+        background: transparent;
+        color: var(--danger);
+        font-size: 16px;
+        padding: 2px 6px;
+      }
+
+      .btn-danger:hover {
+        background: rgba(239, 68, 68, 0.14);
+      }
+
+      .btn-full {
+        width: 100%;
+        min-height: 44px;
+        margin-top: 12px;
+        font-size: 15px;
+      }
+
+      .flex {
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+      .gap-8 {
+        gap: 8px;
+      }
+
+      .process-queue {
+        margin-top: 12px;
+        overflow-x: auto;
+      }
+
+      .process-queue table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+      }
+
+      .process-queue th,
+      .process-queue td {
+        border-bottom: 1px solid rgba(42, 47, 69, 0.45);
+        padding: 5px 6px;
+        text-align: left;
+      }
+
+      .process-queue th {
+        color: var(--muted);
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+
+      .process-queue td {
+        font-family: var(--mono);
+      }
+
+      .sim-results {
+        min-height: 240px;
+      }
+
+      .empty-state {
+        display: flex;
+        min-height: 240px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border: 1px dashed var(--border);
+        border-radius: var(--radius-panel);
+        background: var(--surface);
+        color: var(--muted);
+        text-align: center;
+      }
+
+      .empty-state svg {
+        margin-bottom: 12px;
+        opacity: 0.5;
+      }
+
+      .stat-row {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+
+      .stat-card {
+        border-radius: var(--radius-card);
+        padding: 14px;
+        text-align: center;
+      }
+
+      .stat-val {
+        color: var(--text);
+        font-family: var(--mono);
+        font-size: 20px;
+        font-weight: 700;
+      }
+
+      .stat-label {
+        margin-top: 2px;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+
+      .gantt-container {
+        margin-bottom: 20px;
+        overflow-x: auto;
+        border-radius: var(--radius-card);
+        padding: 20px;
+      }
+
+      .gantt-container h3 {
+        margin-bottom: 14px;
+        font-size: 14px;
+      }
+
+      .gantt-chart {
+        position: relative;
+        display: flex;
+        min-height: var(--gantt-block-h);
+        overflow: hidden;
+        border-radius: 6px;
+      }
+
+      .gantt-block {
+        position: relative;
+        display: flex;
+        min-width: 30px;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        color: #fff;
+        font-family: var(--mono);
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .gantt-block.idle {
+        background: repeating-linear-gradient(
+          45deg,
+          transparent,
+          transparent 4px,
+          rgba(255, 255, 255, 0.05) 4px,
+          rgba(255, 255, 255, 0.05) 8px
+        );
+        color: var(--muted);
+      }
+
+      .gantt-timeline {
+        position: relative;
+        height: 22px;
+        margin-top: 4px;
+      }
+
+      .tick {
+        position: absolute;
+        color: var(--muted);
+        font-family: var(--mono);
+        font-size: 10px;
+        transform: translateX(-50%);
+      }
+
+      .gantt-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 14px;
+      }
+
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .legend-swatch {
+        width: 14px;
+        height: 14px;
+        flex: 0 0 auto;
+        border-radius: 3px;
+      }
+
+      .gantt-chart.scanning .gantt-block {
+        animation: gantt-reveal 0.45s ease forwards;
+        clip-path: inset(0 100% 0 0);
+      }
+
+      @keyframes gantt-reveal {
+        to {
+          clip-path: inset(0 0 0 0);
+        }
+      }
+
+      .problem-card {
+        margin-bottom: 32px;
+        border-radius: var(--radius-panel);
+        padding: 24px;
+      }
+
+      .answer-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 20px;
+      }
+
+      .ans-cell {
+        display: flex;
+        min-height: 60px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border: 1px dashed var(--border);
+        border-radius: var(--radius-input);
+        background: var(--surface-2);
+        padding: 12px;
+        text-align: center;
+      }
+
+      .ans-cell.filled {
+        border-style: solid;
+      }
+
+      .ans-cell.avg,
+      .ans-cell.filled.avg {
+        border-color: var(--accent);
+        background: rgba(91, 123, 255, 0.08);
+      }
+
+      .ans-label {
+        margin-bottom: 4px;
+        color: var(--muted);
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+
+      .ans-value {
+        font-family: var(--mono);
+        font-size: 18px;
+        font-weight: 700;
+      }
+
+      .hint-toggle {
+        display: inline-flex;
+        margin-top: 12px;
+        color: var(--accent-2);
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 700;
+        user-select: none;
+      }
+
+      .hint-toggle:hover {
+        text-decoration: underline;
+      }
+
+      .hint-content {
+        display: none;
+        margin-top: 8px;
+        border: 1px solid rgba(167, 139, 250, 0.22);
+        border-radius: var(--radius-input);
+        background: rgba(167, 139, 250, 0.08);
+        color: var(--text);
+        font-size: 14px;
+        padding: 12px 16px;
+      }
+
+      .hint-content.show {
+        display: block;
+      }
+
+      .step-list {
+        margin: 16px 0 20px;
+        padding-left: 20px;
+      }
+
+      .step-list li {
+        margin-bottom: 10px;
+        color: var(--text);
+        font-size: 14px;
+      }
+
+      @media (max-width: 767px) {
+        .topbar {
+          height: auto;
+          align-items: flex-start;
+          flex-direction: column;
+          padding: 12px;
+        }
+
+        .topbar-nav {
+          width: 100%;
+          overflow-x: auto;
+          padding-bottom: 2px;
+        }
+
+        .topbar-nav a {
+          font-size: 12px;
+          padding: 7px 9px;
+        }
+
+        .topbar-indicator {
+          display: none;
+        }
+
+        .page {
+          padding: 20px 12px 60px;
+        }
+
+        h1 {
+          font-size: 28px;
+        }
+
+        .card-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .sim-layout {
+          grid-template-columns: 1fr;
+        }
+
+        .section-header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .section-header .btn-learn {
+          align-self: flex-start;
+        }
+
+        .formula-box {
+          font-size: 12px;
+          padding: 16px;
+          overflow-x: auto;
+        }
+
+        h2 {
+          font-size: 18px;
+        }
+
+        .subtitle {
+          font-size: 14px;
+        }
+
+        .problem-card {
+          padding: 16px;
+        }
+
+        .styled-table th,
+        .styled-table td {
+          padding: 8px 10px;
+          font-size: 11px;
+        }
+
+        .stat-val {
+          font-size: 16px;
+        }
+
+        .stat-label {
+          font-size: 10px;
+        }
+
+        .gantt-container {
+          padding: 12px;
+        }
+
+        .ans-value {
+          font-size: 14px;
+        }
+
+        .step-list li {
+          font-size: 13px;
+        }
+
+        .btn-learn {
+          font-size: 11px;
+          padding: 5px 10px;
+        }
+
+        .card .btn-learn {
+          margin-top: 12px;
+        }
+
+        .algo-card {
+          min-height: 56px;
+          font-size: 11px;
+          padding: 10px 8px;
+        }
+
+        .modal-body .step-visual {
+          gap: 6px;
+        }
+
+        .modal-body .step-chip {
+          font-size: 11px;
+          padding: 3px 10px;
+        }
+
+        .stat-row,
+        .answer-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .input-row {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* ---- MODAL STYLES ---- */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(6px);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+        padding: 20px;
+      }
+
+      .modal-overlay.open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .modal {
+        max-width: var(--modal-max-w);
+        width: 100%;
+        max-height: 85vh;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-panel);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        transform: translateY(24px) scale(0.97);
+        transition: transform 0.25s ease;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+      }
+
+      .modal-overlay.open .modal {
+        transform: translateY(0) scale(1);
+      }
+
+      .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 20px 24px;
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+      }
+
+      .modal-header h2 {
+        margin: 0;
+        font-size: 20px;
+        color: var(--accent);
+      }
+
+      .modal-close {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-input);
+        background: var(--surface-2);
+        color: var(--text);
+        cursor: pointer;
+        font-size: 18px;
+        transition: background 0.2s, color 0.2s;
+        flex-shrink: 0;
+      }
+
+      .modal-close:hover {
+        background: var(--danger);
+        border-color: var(--danger);
+        color: #fff;
+      }
+
+      .modal-body {
+        padding: 24px;
+        overflow-y: auto;
+        flex: 1;
+      }
+
+      .modal-body h3 {
+        color: var(--accent-2);
+        margin: 20px 0 10px;
+        font-size: 16px;
+      }
+
+      .modal-body h3:first-child {
+        margin-top: 0;
+      }
+
+      .modal-body p,
+      .modal-body li {
+        color: var(--text);
+        font-size: 14px;
+        line-height: 1.7;
+        margin-bottom: 8px;
+      }
+
+      .modal-body ul,
+      .modal-body ol {
+        margin: 8px 0 16px;
+        padding-left: 20px;
+      }
+
+      .modal-body ul li,
+      .modal-body ol li {
+        margin-bottom: 6px;
+        color: var(--muted);
+      }
+
+      .modal-body .highlight {
+        display: inline-block;
+        background: rgba(91, 123, 255, 0.12);
+        color: var(--accent);
+        border-radius: 4px;
+        padding: 2px 8px;
+        font-family: var(--mono);
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .modal-body .mini-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 12px 0 20px;
+        font-size: 13px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-input);
+        overflow: hidden;
+      }
+
+      .modal-body .mini-table th {
+        background: var(--surface-2);
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        padding: 8px 12px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .modal-body .mini-table td {
+        padding: 8px 12px;
+        border-bottom: 1px solid rgba(42, 47, 69, 0.4);
+        font-family: var(--mono);
+      }
+
+      .modal-body .mini-table tr:last-child td {
+        border-bottom: none;
+      }
+
+      .modal-body .formula-inline {
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-input);
+        padding: 12px 16px;
+        margin: 12px 0;
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.8;
+      }
+
+      .modal-body .formula-inline .em {
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      .modal-body .info-callout {
+        background: rgba(167, 139, 250, 0.08);
+        border: 1px solid rgba(167, 139, 250, 0.25);
+        border-radius: var(--radius-input);
+        padding: 12px 16px;
+        margin: 16px 0;
+        font-size: 13px;
+        color: var(--accent-2);
+      }
+
+      .modal-body .info-callout strong {
+        color: var(--accent-2);
+      }
+
+      .modal-body .step-visual {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin: 8px 0 16px;
+      }
+
+      .modal-body .step-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 4px 14px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--text);
+      }
+
+      .modal-body .step-arrow {
+        color: var(--muted);
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .btn-learn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        min-height: 30px;
+        border: 1px solid var(--accent);
+        border-radius: var(--radius-input);
+        background: transparent;
+        color: var(--accent);
+        cursor: pointer;
+        font-family: var(--font);
+        font-size: 12px;
+        font-weight: 700;
+        padding: 6px 14px;
+        transition: background 0.2s, color 0.2s;
+        white-space: nowrap;
+      }
+
+      .btn-learn:hover {
+        background: var(--accent);
+        color: #fff;
+      }
+
+      @media (max-width: 767px) {
+        .modal-overlay {
+          padding: 8px;
+          align-items: flex-end;
+        }
+
+        .modal {
+          max-height: 92vh;
+          border-radius: var(--radius-panel) var(--radius-panel) 0 0;
+        }
+
+        .modal-body {
+          padding: 16px;
+        }
+      }
+
+      @media (min-width: 768px) and (max-width: 1023px) {
+        .sim-layout {
+          grid-template-columns: 320px minmax(0, 1fr);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-logo">SJF <span>Explorer</span></div>
+      <nav class="topbar-nav" id="topbarNav">
+        <a href="#/explanation" class="active" data-page="explanation"
+          >Materi</a
+        >
+        <a href="#/simulator" data-page="simulator">Simulator</a>
+        <a href="#/problems" data-page="problems">Latihan</a>
+        <a href="#/solutions" data-page="solutions">Solusi</a>
+      </nav>
+      <div class="topbar-indicator" id="pageIndicator">Materi</div>
+    </header>
+
+    <main class="page visible fade-in" id="page-explanation">
+      <h1>Shortest Job First</h1>
+      <p class="subtitle">
+        Algoritma penjadwalan CPU yang memilih proses dengan waktu eksekusi
+        paling pendek terlebih dahulu untuk menekan rata-rata waktu tunggu.
+      </p>
+
+      <div class="card-grid">
+        <div class="card">
+          <h3>Apa Itu SJF?</h3>
+          <p>
+            SJF memilih proses dengan burst time paling kecil dari ready queue.
+            Untuk kumpulan proses tertentu, SJF dapat menghasilkan rata-rata
+            waktu tunggu yang sangat rendah.
+          </p>
+          <button class="btn-learn" onclick="openModal('modal-apa-itu')">Pelajari Lebih Lanjut →</button>
+        </div>
+        <div class="card">
+          <h3>SJF Non-Preemptive</h3>
+          <p>
+            Jika proses sudah berjalan, proses tersebut diselesaikan dulu sampai
+            selesai. CPU baru memilih proses berikutnya saat kembali kosong.
+          </p>
+          <button class="btn-learn" onclick="openModal('modal-nonpreemptive')">Pelajari Lebih Lanjut →</button>
+        </div>
+        <div class="card">
+          <h3>SRTF Preemptive</h3>
+          <p>
+            CPU dapat berpindah ke proses baru jika proses tersebut memiliki
+            sisa waktu eksekusi yang lebih pendek daripada proses yang sedang
+            berjalan.
+          </p>
+          <button class="btn-learn" onclick="openModal('modal-preemptive')">Pelajari Lebih Lanjut →</button>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <h2>Rumus Penting</h2>
+        <button class="btn-learn" onclick="openModal('modal-rumus')">Lihat Penjelasan Rumus →</button>
+      </div>
+      <div class="formula-box">
+        <span class="var">Completion Time (CT)</span>
+        <span class="eq">=</span> waktu saat proses selesai<br />
+        <span class="var">Turnaround Time (TAT)</span>
+        <span class="eq">=</span> CT - Arrival Time<br />
+        <span class="var">Waiting Time (WT)</span> <span class="eq">=</span> TAT
+        - Burst Time<br />
+        <span class="var">Rata-rata WT</span> <span class="eq">=</span> total WT
+        / jumlah proses
+      </div>
+
+      <div class="section-header">
+        <h2>Perbandingan SJF dan SRTF</h2>
+        <button class="btn-learn" onclick="openModal('modal-perbandingan')">Lihat Perbandingan Detail →</button>
+      </div>
+      <table class="styled-table comparison-table">
+        <thead>
+          <tr>
+            <th>Aspek</th>
+            <th>SJF Non-Preemptive</th>
+            <th>SRTF Preemptive</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Interupsi</td>
+            <td>Tidak ada</td>
+            <td>Ada</td>
+          </tr>
+          <tr>
+            <td>Overhead</td>
+            <td>Lebih rendah</td>
+            <td>Lebih tinggi</td>
+          </tr>
+          <tr>
+            <td>Rata-rata tunggu</td>
+            <td>Bisa lebih tinggi</td>
+            <td>Biasanya paling optimal</td>
+          </tr>
+          <tr>
+            <td>Cocok untuk</td>
+            <td>Sistem batch</td>
+            <td>Sistem interaktif</td>
+          </tr>
+          <tr>
+            <td>Risiko starvation</td>
+            <td>Mungkin terjadi pada proses panjang</td>
+            <td>Mungkin terjadi pada proses panjang</td>
+          </tr>
+        </tbody>
+      </table>
+    </main>
+
+    <main class="page" id="page-simulator">
+      <h2>Simulator Interaktif</h2>
+      <p class="subtitle">
+        Tambahkan proses, pilih algoritma, lalu jalankan simulasi untuk melihat
+        Gantt chart dan hasil perhitungan.
+      </p>
+
+      <div class="sim-layout">
+        <section class="sim-controls">
+          <div class="ctrl-group">
+            <label>Algoritma</label>
+            <div class="algo-selector" id="algoSelector">
+              <div class="algo-card selected" data-algo="sjf">
+                SJF Non-Preemptive
+              </div>
+              <div class="algo-card" data-algo="srtf">SRTF Preemptive</div>
+            </div>
+          </div>
+
+          <div class="ctrl-group">
+            <label>Tambah Proses</label>
+            <div class="input-row">
+              <input
+                type="text"
+                id="inputPid"
+                placeholder="PID"
+                maxlength="6"
+              />
+              <input type="number" id="inputAt" placeholder="AT" min="0" />
+              <input type="number" id="inputBt" placeholder="BT" min="1" />
+            </div>
+            <div class="flex gap-8">
+              <button class="btn" id="btnAddProcess">Tambah</button>
+              <button class="btn" id="btnLoadExample">Contoh</button>
+              <button class="btn" id="btnClear">Kosongkan</button>
+            </div>
+          </div>
+
+          <div class="process-queue">
+            <table>
+              <thead>
+                <tr>
+                  <th>PID</th>
+                  <th>AT</th>
+                  <th>BT</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="queueBody"></tbody>
+            </table>
+          </div>
+
+          <button class="btn btn-primary btn-full" id="btnRunSim">
+            Jalankan Simulasi
+          </button>
+        </section>
+
+        <section class="sim-results">
+          <div class="empty-state" id="emptyState">
+            <svg
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+              <path d="M3 9h18"></path>
+              <path d="M9 3v18"></path>
+            </svg>
+            <p>Tambahkan proses untuk melihat hasil simulasi.</p>
+          </div>
+
+          <div id="resultsContent" style="display: none">
+            <div class="stat-row">
+              <div class="stat-card">
+                <div class="stat-val" id="statProcesses">0</div>
+                <div class="stat-label">Proses</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-val" id="statAvgWT">0.00</div>
+                <div class="stat-label">Rata WT</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-val" id="statAvgTAT">0.00</div>
+                <div class="stat-label">Rata TAT</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-val" id="statAlgo">SJF</div>
+                <div class="stat-label">Algoritma</div>
+              </div>
+            </div>
+
+            <div class="gantt-container">
+              <h3>Gantt Chart</h3>
+              <div class="gantt-chart scanning" id="ganttChart"></div>
+              <div class="gantt-timeline" id="ganttTimeline"></div>
+              <div class="gantt-legend" id="ganttLegend"></div>
+            </div>
+
+            <table class="styled-table">
+              <thead>
+                <tr>
+                  <th>PID</th>
+                  <th>AT</th>
+                  <th>BT</th>
+                  <th>CT</th>
+                  <th>TAT</th>
+                  <th>WT</th>
+                </tr>
+              </thead>
+              <tbody id="resultsBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <main class="page" id="page-problems">
+      <h2>Latihan Soal</h2>
+      <p class="subtitle">
+        Kerjakan manual terlebih dahulu, lalu cocokkan dengan halaman solusi.
+      </p>
+
+      <section class="problem-card">
+        <h3>Soal 1 - SJF Non-Preemptive</h3>
+        <table class="styled-table">
+          <thead>
+            <tr>
+              <th>Proses</th>
+              <th>Arrival Time</th>
+              <th>Burst Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>P1</td>
+              <td>0</td>
+              <td>7</td>
+            </tr>
+            <tr>
+              <td>P2</td>
+              <td>2</td>
+              <td>4</td>
+            </tr>
+            <tr>
+              <td>P3</td>
+              <td>4</td>
+              <td>1</td>
+            </tr>
+            <tr>
+              <td>P4</td>
+              <td>5</td>
+              <td>4</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="answer-grid">
+          <div class="ans-cell">
+            <div class="ans-label">Urutan</div>
+            <div class="ans-value">?</div>
+          </div>
+          <div class="ans-cell">
+            <div class="ans-label">Rata WT</div>
+            <div class="ans-value">?</div>
+          </div>
+          <div class="ans-cell">
+            <div class="ans-label">Rata TAT</div>
+            <div class="ans-value">?</div>
+          </div>
+        </div>
+        <div class="hint-toggle" onclick="toggleHint('hint1')">
+          Tampilkan petunjuk
+        </div>
+        <div class="hint-content" id="hint1">
+          Saat CPU kosong, pilih proses yang sudah datang dan memiliki burst
+          time paling kecil. Jika ada nilai sama, pilih yang datang lebih dulu.
+        </div>
+      </section>
+
+      <section class="problem-card">
+        <h3>Soal 2 - SRTF Preemptive</h3>
+        <table class="styled-table">
+          <thead>
+            <tr>
+              <th>Proses</th>
+              <th>Arrival Time</th>
+              <th>Burst Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>P1</td>
+              <td>0</td>
+              <td>8</td>
+            </tr>
+            <tr>
+              <td>P2</td>
+              <td>1</td>
+              <td>4</td>
+            </tr>
+            <tr>
+              <td>P3</td>
+              <td>2</td>
+              <td>9</td>
+            </tr>
+            <tr>
+              <td>P4</td>
+              <td>3</td>
+              <td>5</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="answer-grid">
+          <div class="ans-cell">
+            <div class="ans-label">Urutan</div>
+            <div class="ans-value">?</div>
+          </div>
+          <div class="ans-cell">
+            <div class="ans-label">Rata WT</div>
+            <div class="ans-value">?</div>
+          </div>
+          <div class="ans-cell">
+            <div class="ans-label">Rata TAT</div>
+            <div class="ans-value">?</div>
+          </div>
+        </div>
+        <div class="hint-toggle" onclick="toggleHint('hint2')">
+          Tampilkan petunjuk
+        </div>
+        <div class="hint-content" id="hint2">
+          Setiap ada proses baru, bandingkan burst time proses baru dengan sisa
+          waktu proses yang sedang berjalan.
+        </div>
+      </section>
+    </main>
+
+    <main class="page" id="page-solutions">
+      <h2>Pembahasan Solusi</h2>
+      <p class="subtitle">
+        Gunakan bagian ini untuk menjelaskan langkah perhitungan saat
+        presentasi.
+      </p>
+
+      <section class="problem-card">
+        <h3>Solusi 1 - SJF Non-Preemptive</h3>
+        <ol class="step-list">
+          <li>
+            t=0: hanya P1 yang sudah datang, maka P1 berjalan dari 0 sampai 7.
+          </li>
+          <li>
+            t=7: P2, P3, dan P4 sudah ada di ready queue. Burst paling kecil
+            adalah P3, maka P3 berjalan dari 7 sampai 8.
+          </li>
+          <li>
+            t=8: P2 dan P4 sama-sama memiliki burst 4. P2 datang lebih dulu,
+            maka P2 berjalan dari 8 sampai 12.
+          </li>
+          <li>t=12: P4 berjalan dari 12 sampai 16.</li>
+        </ol>
+        <div class="gantt-container">
+          <h3>Gantt Chart</h3>
+          <div id="solution1Gantt" class="gantt-chart"></div>
+          <div id="solution1Timeline" class="gantt-timeline"></div>
+        </div>
+        <table class="styled-table">
+          <thead>
+            <tr>
+              <th>PID</th>
+              <th>AT</th>
+              <th>BT</th>
+              <th>CT</th>
+              <th>TAT</th>
+              <th>WT</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>P1</td>
+              <td>0</td>
+              <td>7</td>
+              <td>7</td>
+              <td>7</td>
+              <td>0</td>
+            </tr>
+            <tr>
+              <td>P2</td>
+              <td>2</td>
+              <td>4</td>
+              <td>12</td>
+              <td>10</td>
+              <td>6</td>
+            </tr>
+            <tr>
+              <td>P3</td>
+              <td>4</td>
+              <td>1</td>
+              <td>8</td>
+              <td>4</td>
+              <td>3</td>
+            </tr>
+            <tr>
+              <td>P4</td>
+              <td>5</td>
+              <td>4</td>
+              <td>16</td>
+              <td>11</td>
+              <td>7</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="formula-box">
+          Rata-rata WT = (0 + 6 + 3 + 7) / 4 = <strong>4.00</strong><br />
+          Rata-rata TAT = (7 + 10 + 4 + 11) / 4 = <strong>8.00</strong>
+        </div>
+      </section>
+
+      <section class="problem-card">
+        <h3>Solusi 2 - SRTF Preemptive</h3>
+        <ol class="step-list">
+          <li>t=0: P1 datang dan mulai berjalan.</li>
+          <li>
+            t=1: P2 datang dengan burst 4, lebih kecil daripada sisa P1 yaitu 7.
+            P1 dihentikan, P2 berjalan.
+          </li>
+          <li>
+            t=2 dan t=3: P3 dan P4 datang, tetapi sisa P2 tetap paling kecil.
+          </li>
+          <li>
+            t=5: P2 selesai. Pilih P4 karena sisa waktunya 5, paling kecil
+            dibanding P1 dan P3.
+          </li>
+          <li>
+            t=10: P4 selesai. P1 berjalan sampai t=17, lalu P3 berjalan sampai
+            t=26.
+          </li>
+        </ol>
+        <div class="gantt-container">
+          <h3>Gantt Chart</h3>
+          <div id="solution2Gantt" class="gantt-chart"></div>
+          <div id="solution2Timeline" class="gantt-timeline"></div>
+        </div>
+        <table class="styled-table">
+          <thead>
+            <tr>
+              <th>PID</th>
+              <th>AT</th>
+              <th>BT</th>
+              <th>CT</th>
+              <th>TAT</th>
+              <th>WT</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>P1</td>
+              <td>0</td>
+              <td>8</td>
+              <td>17</td>
+              <td>17</td>
+              <td>9</td>
+            </tr>
+            <tr>
+              <td>P2</td>
+              <td>1</td>
+              <td>4</td>
+              <td>5</td>
+              <td>4</td>
+              <td>0</td>
+            </tr>
+            <tr>
+              <td>P3</td>
+              <td>2</td>
+              <td>9</td>
+              <td>26</td>
+              <td>24</td>
+              <td>15</td>
+            </tr>
+            <tr>
+              <td>P4</td>
+              <td>3</td>
+              <td>5</td>
+              <td>10</td>
+              <td>7</td>
+              <td>2</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="formula-box">
+          Rata-rata WT = (9 + 0 + 15 + 2) / 4 = <strong>6.50</strong><br />
+          Rata-rata TAT = (17 + 4 + 24 + 7) / 4 = <strong>13.00</strong>
+        </div>
+      </section>
+    </main>
+
+    <!-- MODAL OVERLAYS -->
+    <div class="modal-overlay" id="modal-apa-itu">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>Apa Itu Shortest Job First (SJF)?</h2>
+          <button class="modal-close" onclick="closeModal('modal-apa-itu')" aria-label="Tutup modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <h3>Definisi</h3>
+          <p>
+            <strong>Shortest Job First (SJF)</strong> adalah algoritma penjadwalan CPU yang
+            <strong>memprioritaskan proses dengan <span class="highlight">Burst Time (BT)</span> paling kecil</strong> dari antrian ready queue.
+            Algoritma ini termasuk dalam kategori <em>priority scheduling</em> di mana prioritas ditentukan oleh durasi eksekusi.
+          </p>
+
+          <h3>Kenapa SJF Efektif?</h3>
+          <p>SJF <strong>terbukti optimal</strong> untuk meminimalkan rata-rata waiting time pada kumpulan proses tertentu. Ini dapat dibuktikan secara matematis — mengerjakan pekerjaan pendek lebih dulu akan membuat pekerjaan panjang menunggu, tetapi total akumulasi waktu tunggu menjadi paling kecil.</p>
+
+          <div class="info-callout">
+            <strong>Intuisi:</strong> Seperti antrian di kasir — jika orang dengan belanjaan sedikit dilayani lebih dulu, maka rata-rata waktu tunggu semua orang di antrian menjadi lebih rendah.
+          </div>
+
+          <h3>Dua Varian SJF</h3>
+          <ul>
+            <li><strong>SJF Non-Preemptive:</strong> Sekali proses mulai dieksekusi, proses tersebut tidak bisa diinterupsi sampai selesai. CPU idle hanya saat tidak ada proses yang siap.</li>
+            <li><strong>SRTF (Shortest Remaining Time First) / SJF Preemptive:</strong> Jika ada proses baru dengan sisa burst time lebih kecil dari proses yang sedang berjalan, CPU akan beralih (preempt) ke proses baru tersebut.</li>
+          </ul>
+
+          <h3>Karakteristik Utama</h3>
+          <table class="mini-table">
+            <thead><tr><th>Properti</th><th>Penjelasan</th></tr></thead>
+            <tbody>
+              <tr><td>Jenis</td><td>Non-Preemptive atau Preemptive</td></tr>
+              <tr><td>Kriteria Seleksi</td><td>Burst time terkecil</td></tr>
+              <tr><td>Optimalitas</td><td>Optimal untuk rata-rata waiting time minimum</td></tr>
+              <tr><td>Kebutuhan</td><td>Harus tahu burst time di awal (sulit di sistem nyata)</td></tr>
+              <tr><td>Risiko</td><td>Starvation pada proses dengan burst time besar</td></tr>
+            </tbody>
+          </table>
+
+          <h3>Contoh Sederhana</h3>
+          <p>Misal ada tiga proses:</p>
+          <table class="mini-table">
+            <thead><tr><th>Proses</th><th>Burst Time</th></tr></thead>
+            <tbody>
+              <tr><td>P1</td><td>6</td></tr>
+              <tr><td>P2</td><td>8</td></tr>
+              <tr><td>P3</td><td>3</td></tr>
+            </tbody>
+          </table>
+          <p>Urutan SJF: <span class="highlight">P3 → P1 → P2</span> (burst terkecil dulu).</p>
+          <p>Jika dikerjakan dalam urutan datang (FCFS): P1(0-6), P2(6-14), P3(14-17) → rata WT = (0 + 6 + 14)/3 = <strong>6.67</strong></p>
+          <p>Dengan SJF: P3(0-3), P1(3-9), P2(9-17) → rata WT = (3 + 9 + 0)/3 = <strong>4.00</strong> ← lebih kecil!</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-nonpreemptive">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>SJF Non-Preemptive — Detail</h2>
+          <button class="modal-close" onclick="closeModal('modal-nonpreemptive')" aria-label="Tutup modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <h3>Cara Kerja</h3>
+          <p>Pada SJF Non-Preemptive, <strong>CPU tidak bisa merebut proses yang sedang berjalan</strong>. Keputusan penjadwalan hanya diambil saat:</p>
+          <ul>
+            <li>CPU sedang <strong>idle</strong> (tidak ada proses yang berjalan)</li>
+            <li>Sebuah proses <strong>baru saja selesai</strong> dieksekusi</li>
+          </ul>
+
+          <h3>Algoritma Langkah demi Langkah</h3>
+          <ol>
+            <li>Saat CPU kosong, lihat semua proses yang <strong>sudah datang</strong> (arrival time ≤ waktu saat ini).</li>
+            <li>Pilih proses dengan <strong>burst time terkecil</strong> di antara yang sudah datang.</li>
+            <li>Jika ada dua proses dengan burst time sama, pilih yang <strong>datang lebih dulu</strong> (FCFS sebagai tie-breaker).</li>
+            <li>Jalankan proses tersebut <strong>sampai selesai</strong> — tidak boleh diinterupsi.</li>
+            <li>Update waktu, tandai proses selesai, lalu ulangi dari langkah 1.</li>
+          </ol>
+
+          <h3>Ilustrasi Eksekusi</h3>
+          <div class="step-visual">
+            <span class="step-chip">CPU Idle?</span>
+            <span class="step-arrow">→</span>
+            <span class="step-chip">Cek Ready Queue</span>
+            <span class="step-arrow">→</span>
+            <span class="step-chip">Pilih BT Terkecil</span>
+            <span class="step-arrow">→</span>
+            <span class="step-chip">Jalankan Sampai Selesai</span>
+            <span class="step-arrow">→</span>
+            <span class="step-chip">Ulangi</span>
+          </div>
+
+          <div class="info-callout">
+            <strong>Kelebihan:</strong> Sederhana diimplementasikan, overhead context switching rendah karena tidak ada preemption.<br><br>
+            <strong>Kekurangan:</strong> Proses dengan burst time besar bisa mengalami <strong>starvation</strong> (menunggu sangat lama) jika terus-menerus ada proses pendek baru yang datang.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-preemptive">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>SRTF (Preemptive SJF) — Detail</h2>
+          <button class="modal-close" onclick="closeModal('modal-preemptive')" aria-label="Tutup modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <h3>Cara Kerja</h3>
+          <p>
+            <strong>Shortest Remaining Time First (SRTF)</strong> adalah versi preemptive dari SJF. CPU <strong>dapat menginterupsi</strong> proses yang sedang berjalan jika ada proses baru dengan <strong>remaining time (sisa burst time) yang lebih kecil</strong>.
+          </p>
+
+          <h3>Algoritma Langkah demi Langkah</h3>
+          <ol>
+            <li>Setiap satuan waktu, periksa <strong>semua proses yang sudah datang</strong> dan belum selesai.</li>
+            <li>Hitung <strong>remaining time</strong> = burst time - waktu yang sudah dijalankan.</li>
+            <li>Pilih proses dengan <strong>remaining time terkecil</strong> untuk dijalankan pada waktu berikutnya.</li>
+            <li>Jika proses yang terpilih berbeda dengan yang sedang berjalan, lakukan <strong>context switch</strong> (preemption).</li>
+            <li>Ulangi setiap satuan waktu sampai semua proses selesai.</li>
+          </ol>
+
+          <h3>Ilustrasi Eksekusi</h3>
+          <div class="step-visual">
+            <span class="step-chip">t = t + 1</span>
+            <span class="step-arrow">→</span>
+            <span class="step-chip">Cek Semua Proses</span>
+            <span class="step-arrow">→</span>
+            <span class="step-chip">Hitung Remaining Time</span>
+            <span class="step-arrow">→</span>
+            <span class="step-chip">Pilih RT Terkecil</span>
+            <span class="step-arrow">→</span>
+            <span class="step-chip">Preempt Jika Berbeda</span>
+          </div>
+
+          <div class="info-callout">
+            <strong>Kelebihan:</strong> Memberikan rata-rata waiting time yang <strong>paling optimal</strong> di antara semua algoritma penjadwalan. Lebih responsif untuk sistem interaktif.<br><br>
+            <strong>Kekurangan:</strong> <strong>Overhead context switching tinggi</strong> karena preemption bisa terjadi sangat sering. Lebih kompleks diimplementasikan. Starvation tetap mungkin terjadi.
+          </div>
+
+          <h3>Contoh Perbandingan</h3>
+          <p>Proses: P1(AT=0, BT=8), P2(AT=1, BT=4), P3(AT=2, BT=9), P4(AT=3, BT=5)</p>
+          <p><strong>SJF Non-Preemptive:</strong> P1(0-8) → P2(8-12) → P4(12-17) → P3(17-26) — urutan tetap.</p>
+          <p><strong>SRTF:</strong> P1(0-1) → P2(1-5) → P4(5-10) → P1(10-17) → P3(17-26) — P1 di-preempt oleh P2!</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-rumus">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>Rumus & Perhitungan SJF</h2>
+          <button class="modal-close" onclick="closeModal('modal-rumus')" aria-label="Tutup modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <h3>1. Completion Time (CT)</h3>
+          <p>Waktu saat sebuah proses <strong>selesai dieksekusi</strong>. Diperoleh dari penelusuran Gantt chart.</p>
+          <div class="formula-inline">
+            <span class="em">CT</span> = waktu selesai pada Gantt chart
+          </div>
+
+          <h3>2. Turnaround Time (TAT)</h3>
+          <p>Total waktu sejak proses <strong>datang</strong> hingga <strong>selesai</strong>. Mencakup waiting time + execution time.</p>
+          <div class="formula-inline">
+            <span class="em">TAT</span> = CT − AT = WT + BT
+          </div>
+          <p>Semakin kecil TAT, semakin cepat proses diselesaikan sejak kedatangannya.</p>
+
+          <h3>3. Waiting Time (WT)</h3>
+          <p>Total waktu proses <strong>menunggu di ready queue</strong> sebelum dan selama eksekusi (tidak termasuk waktu eksekusi).</p>
+          <div class="formula-inline">
+            <span class="em">WT</span> = TAT − BT
+          </div>
+
+          <h3>4. Response Time (RT) — Konsep Tambahan</h3>
+          <p>Waktu sejak proses datang sampai <strong>pertama kali</strong> mendapat CPU. Relevan untuk sistem interaktif.</p>
+          <div class="formula-inline">
+            <span class="em">RT</span> = waktu mulai pertama − AT
+          </div>
+
+          <h3>5. Rata-rata</h3>
+          <div class="formula-inline">
+            <span class="em">Rata-rata WT</span> = Σ WT / N &nbsp;&nbsp;|&nbsp;&nbsp; <span class="em">Rata-rata TAT</span> = Σ TAT / N
+          </div>
+
+          <h3>Contoh Perhitungan Manual</h3>
+          <table class="mini-table">
+            <thead><tr><th>PID</th><th>AT</th><th>BT</th><th>CT</th><th>TAT</th><th>WT</th></tr></thead>
+            <tbody>
+              <tr><td>P1</td><td>0</td><td>7</td><td>7</td><td>7 - 0 = 7</td><td>7 - 7 = 0</td></tr>
+              <tr><td>P2</td><td>2</td><td>4</td><td>12</td><td>12 - 2 = 10</td><td>10 - 4 = 6</td></tr>
+              <tr><td>P3</td><td>4</td><td>1</td><td>8</td><td>8 - 4 = 4</td><td>4 - 1 = 3</td></tr>
+              <tr><td>P4</td><td>5</td><td>4</td><td>16</td><td>16 - 5 = 11</td><td>11 - 4 = 7</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Rata-rata WT</strong> = (0 + 6 + 3 + 7) / 4 = <span class="highlight">4.00</span></p>
+          <p><strong>Rata-rata TAT</strong> = (7 + 10 + 4 + 11) / 4 = <span class="highlight">8.00</span></p>
+
+          <div class="info-callout">
+            <strong>Tips:</strong> Selalu gambar Gantt chart dulu, lalu isi CT dari chart, baru hitung TAT dan WT. Ini mengurangi risiko salah hitung.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-perbandingan">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>Perbandingan SJF vs SRTF — Detail Lengkap</h2>
+          <button class="modal-close" onclick="closeModal('modal-perbandingan')" aria-label="Tutup modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <h3>Tabel Perbandingan</h3>
+          <table class="mini-table">
+            <thead><tr><th>Aspek</th><th>SJF Non-Preemptive</th><th>SRTF Preemptive</th></tr></thead>
+            <tbody>
+              <tr><td>Preemption</td><td>Tidak ada</td><td>Ada (bisa di-interrupt)</td></tr>
+              <tr><td>Context Switch</td><td>Minimal (hanya saat proses selesai)</td><td>Sering (setiap ada proses lebih pendek)</td></tr>
+              <tr><td>Overhead</td><td>Rendah</td><td>Tinggi</td></tr>
+              <tr><td>Rata-rata WT</td><td>Rendah, tapi bisa lebih tinggi dari SRTF</td><td>Paling optimal secara teoritis</td></tr>
+              <tr><td>Implementasi</td><td>Sederhana</td><td>Kompleks</td></tr>
+              <tr><td>Cocok untuk</td><td>Sistem batch, background jobs</td><td>Sistem real-time, interaktif</td></tr>
+              <tr><td>Starvation</td><td>Mungkin pada proses panjang</td><td>Mungkin, tapi lebih kecil kemungkinannya</td></tr>
+              <tr><td>Prediksi BT</td><td>Dibutuhkan (sulit di sistem nyata)</td><td>Dibutuhkan (sulit di sistem nyata)</td></tr>
+            </tbody>
+          </table>
+
+          <h3>Kapan Menggunakan SJF Non-Preemptive?</h3>
+          <ul>
+            <li>Sistem <strong>batch processing</strong> di mana semua job sudah diketahui di awal</li>
+            <li>Lingkungan dengan <strong>overhead context switch yang mahal</strong></li>
+            <li>Sistem embedded sederhana dengan jumlah proses terbatas</li>
+          </ul>
+
+          <h3>Kapan Menggunakan SRTF?</h3>
+          <ul>
+            <li>Sistem <strong>interaktif</strong> yang membutuhkan respons cepat</li>
+            <li>Sistem <strong>time-sharing</strong> di mana pengguna mengharapkan responsivitas</li>
+            <li>Ketika <strong>rata-rata waiting time minimal</strong> adalah prioritas utama</li>
+          </ul>
+
+          <div class="info-callout">
+            <strong>Kesimpulan:</strong> SRTF memberikan hasil <strong>paling optimal</strong> untuk rata-rata waiting time, tetapi dengan biaya overhead yang lebih tinggi. SJF Non-Preemptive adalah pilihan yang baik ketika overhead context switch perlu diminimalkan dan prediktabilitas lebih penting daripada optimalitas absolut.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ---- MODAL LOGIC ----
+      function openModal(id) {
+        const overlay = document.getElementById(id);
+        if (!overlay) return;
+        overlay.classList.add("open");
+        document.body.classList.add("modal-open");
+        // Focus trap: fokus ke close button
+        const closeBtn = overlay.querySelector(".modal-close");
+        if (closeBtn) setTimeout(() => closeBtn.focus(), 100);
+      }
+
+      function closeModal(id) {
+        const overlay = document.getElementById(id);
+        if (!overlay) return;
+        overlay.classList.remove("open");
+        document.body.classList.remove("modal-open");
+      }
+
+      // Close modal on overlay click (click outside modal box)
+      document.addEventListener("click", function (e) {
+        if (e.target.classList.contains("modal-overlay") && e.target.classList.contains("open")) {
+          closeModal(e.target.id);
+        }
+      });
+
+      // Close modal on Escape key
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") {
+          const openOverlay = document.querySelector(".modal-overlay.open");
+          if (openOverlay) closeModal(openOverlay.id);
+        }
+      });
+
+      // ---- EXISTING APP LOGIC ----
+      const PAGES = ["explanation", "simulator", "problems", "solutions"];
+      const PAGE_NAMES = {
+        explanation: "Materi",
+        simulator: "Simulator",
+        problems: "Latihan",
+        solutions: "Solusi",
+      };
+      const COLORS = [
+        "#5b7bff",
+        "#a78bfa",
+        "#34d399",
+        "#fbbf24",
+        "#f472b6",
+        "#60a5fa",
+        "#a3e635",
+        "#fb923c",
+      ];
+
+      let currentPage = "explanation";
+      let currentAlgo = "sjf";
+      let processes = [];
+
+      function navigateTo(page) {
+        if (!PAGES.includes(page) || page === currentPage) return;
+
+        const oldPage = document.getElementById("page-" + currentPage);
+        if (oldPage) {
+          oldPage.classList.remove("fade-in");
+          oldPage.classList.remove("visible");
+        }
+
+        const nextPage = document.getElementById("page-" + page);
+        if (nextPage) {
+          nextPage.classList.add("visible");
+          requestAnimationFrame(() => nextPage.classList.add("fade-in"));
+        }
+
+        document.querySelectorAll(".topbar-nav a").forEach((link) => {
+          link.classList.toggle("active", link.dataset.page === page);
+        });
+
+        document.getElementById("pageIndicator").textContent = PAGE_NAMES[page];
+        currentPage = page;
+      }
+
+      function handleHashChange() {
+        const page = (location.hash.slice(1) || "/explanation").replace(
+          "/",
+          "",
+        );
+        navigateTo(PAGES.includes(page) ? page : "explanation");
+      }
+
+      function toggleHint(id) {
+        const hint = document.getElementById(id);
+        if (hint) hint.classList.toggle("show");
+      }
+
+      function getColor(pid) {
+        if (pid === "Idle") return "transparent";
+        let hash = 0;
+        for (let i = 0; i < pid.length; i += 1) {
+          hash = (hash << 5) - hash + pid.charCodeAt(i);
+        }
+        return COLORS[Math.abs(hash) % COLORS.length];
+      }
+
+      function simulateSJF(source) {
+        const ps = source
+          .map((p) => ({ ...p }))
+          .sort(
+            (a, b) =>
+              a.arrival - b.arrival ||
+              a.burst - b.burst ||
+              a.pid.localeCompare(b.pid),
+          );
+        const done = new Array(ps.length).fill(false);
+        const results = ps.map((p) => ({
+          pid: p.pid,
+          arrival: p.arrival,
+          burst: p.burst,
+          ct: 0,
+          tat: 0,
+          wt: 0,
+        }));
+        const ganttBlocks = [];
+        let time = 0;
+        let completed = 0;
+
+        while (completed < ps.length) {
+          let idx = -1;
+          let minBurst = Infinity;
+
+          for (let i = 0; i < ps.length; i += 1) {
+            if (!done[i] && ps[i].arrival <= time) {
+              const betterBurst = ps[i].burst < minBurst;
+              const sameBurstEarlier =
+                ps[i].burst === minBurst &&
+                idx !== -1 &&
+                ps[i].arrival < ps[idx].arrival;
+              if (betterBurst || sameBurstEarlier) {
+                minBurst = ps[i].burst;
+                idx = i;
+              }
+            }
+          }
+
+          if (idx === -1) {
+            const nextArrival = Math.min(
+              ...ps.filter((_, i) => !done[i]).map((p) => p.arrival),
+            );
+            if (nextArrival > time)
+              ganttBlocks.push({ pid: "Idle", start: time, end: nextArrival });
+            time = nextArrival;
+            continue;
+          }
+
+          const p = ps[idx];
+          ganttBlocks.push({ pid: p.pid, start: time, end: time + p.burst });
+          time += p.burst;
+          done[idx] = true;
+          completed += 1;
+
+          const row = results.find((r) => r.pid === p.pid);
+          row.ct = time;
+          row.tat = row.ct - row.arrival;
+          row.wt = row.tat - row.burst;
+        }
+
+        return {
+          ganttBlocks,
+          results: results.sort((a, b) => a.pid.localeCompare(b.pid)),
+        };
+      }
+
+      function simulateSRTF(source) {
+        const ps = source
+          .map((p) => ({ ...p, remaining: p.burst }))
+          .sort((a, b) => a.arrival - b.arrival || a.pid.localeCompare(b.pid));
+        const results = ps.map((p) => ({
+          pid: p.pid,
+          arrival: p.arrival,
+          burst: p.burst,
+          ct: 0,
+          tat: 0,
+          wt: 0,
+        }));
+        const blocks = [];
+        let time = 0;
+        let completed = 0;
+        let activePid = null;
+        let blockStart = 0;
+
+        function closeBlock(endTime) {
+          if (activePid !== null && endTime > blockStart) {
+            blocks.push({ pid: activePid, start: blockStart, end: endTime });
+          }
+        }
+
+        while (completed < ps.length) {
+          let idx = -1;
+          let minRemaining = Infinity;
+
+          for (let i = 0; i < ps.length; i += 1) {
+            if (ps[i].arrival <= time && ps[i].remaining > 0) {
+              const betterRemaining = ps[i].remaining < minRemaining;
+              const sameRemainingEarlier =
+                ps[i].remaining === minRemaining &&
+                idx !== -1 &&
+                ps[i].arrival < ps[idx].arrival;
+              if (betterRemaining || sameRemainingEarlier) {
+                minRemaining = ps[i].remaining;
+                idx = i;
+              }
+            }
+          }
+
+          const nextPid = idx === -1 ? "Idle" : ps[idx].pid;
+          if (nextPid !== activePid) {
+            closeBlock(time);
+            activePid = nextPid;
+            blockStart = time;
+          }
+
+          if (idx === -1) {
+            const nextArrival = Math.min(
+              ...ps
+                .filter((p) => p.remaining > 0 && p.arrival > time)
+                .map((p) => p.arrival),
+            );
+            time = Number.isFinite(nextArrival) ? nextArrival : time + 1;
+            continue;
+          }
+
+          ps[idx].remaining -= 1;
+          time += 1;
+
+          if (ps[idx].remaining === 0) {
+            const row = results.find((r) => r.pid === ps[idx].pid);
+            row.ct = time;
+            row.tat = row.ct - row.arrival;
+            row.wt = row.tat - row.burst;
+            completed += 1;
+          }
+        }
+
+        closeBlock(time);
+        const merged = [];
+        blocks.forEach((block) => {
+          const previous = merged[merged.length - 1];
+          if (previous && previous.pid === block.pid) {
+            previous.end = block.end;
+          } else {
+            merged.push({ ...block });
+          }
+        });
+
+        return {
+          ganttBlocks: merged,
+          results: results.sort((a, b) => a.pid.localeCompare(b.pid)),
+        };
+      }
+
+      function initSimulator() {
+        document.querySelectorAll(".algo-card").forEach((card) => {
+          card.addEventListener("click", () => {
+            document
+              .querySelectorAll(".algo-card")
+              .forEach((item) => item.classList.remove("selected"));
+            card.classList.add("selected");
+            currentAlgo = card.dataset.algo;
+          });
+        });
+
+        document
+          .getElementById("btnAddProcess")
+          .addEventListener("click", addProcess);
+        document
+          .getElementById("btnLoadExample")
+          .addEventListener("click", loadExample);
+        document
+          .getElementById("btnClear")
+          .addEventListener("click", clearProcesses);
+        document
+          .getElementById("btnRunSim")
+          .addEventListener("click", runSimulation);
+
+        ["inputPid", "inputAt", "inputBt"].forEach((id) => {
+          document.getElementById(id).addEventListener("keydown", (event) => {
+            if (event.key === "Enter") addProcess();
+          });
+        });
+
+        loadExample();
+      }
+
+      function addProcess() {
+        const pid = document
+          .getElementById("inputPid")
+          .value.trim()
+          .toUpperCase();
+        const arrival = Number.parseInt(
+          document.getElementById("inputAt").value,
+          10,
+        );
+        const burst = Number.parseInt(
+          document.getElementById("inputBt").value,
+          10,
+        );
+
+        if (!pid) {
+          alert("PID belum diisi.");
+          return;
+        }
+
+        if (!/^[A-Z0-9_-]+$/.test(pid)) {
+          alert(
+            "PID hanya boleh berisi huruf, angka, garis bawah, atau tanda minus.",
+          );
+          return;
+        }
+
+        if (Number.isNaN(arrival) || arrival < 0) {
+          alert("Arrival Time harus berupa angka 0 atau lebih.");
+          return;
+        }
+
+        if (Number.isNaN(burst) || burst < 1) {
+          alert("Burst Time harus berupa angka 1 atau lebih.");
+          return;
+        }
+
+        if (processes.some((p) => p.pid === pid)) {
+          alert("PID sudah ada.");
+          return;
+        }
+
+        processes.push({ pid, arrival, burst });
+        document.getElementById("inputPid").value = "";
+        document.getElementById("inputAt").value = "";
+        document.getElementById("inputBt").value = "";
+        document.getElementById("inputPid").focus();
+        renderQueue();
+      }
+
+      const EXAMPLE_POOLS = [
+        [
+          { pid: "P1", arrival: 0, burst: 6 },
+          { pid: "P2", arrival: 1, burst: 8 },
+          { pid: "P3", arrival: 2, burst: 7 },
+          { pid: "P4", arrival: 3, burst: 3 },
+        ],
+        [
+          { pid: "P1", arrival: 0, burst: 5 },
+          { pid: "P2", arrival: 1, burst: 3 },
+          { pid: "P3", arrival: 2, burst: 9 },
+          { pid: "P4", arrival: 3, burst: 2 },
+          { pid: "P5", arrival: 4, burst: 4 },
+        ],
+        [
+          { pid: "P1", arrival: 0, burst: 10 },
+          { pid: "P2", arrival: 2, burst: 4 },
+          { pid: "P3", arrival: 3, burst: 6 },
+          { pid: "P4", arrival: 5, burst: 2 },
+        ],
+        [
+          { pid: "P1", arrival: 0, burst: 3 },
+          { pid: "P2", arrival: 1, burst: 7 },
+          { pid: "P3", arrival: 3, burst: 2 },
+          { pid: "P4", arrival: 5, burst: 5 },
+          { pid: "P5", arrival: 6, burst: 1 },
+        ],
+        [
+          { pid: "P1", arrival: 0, burst: 8 },
+          { pid: "P2", arrival: 0, burst: 4 },
+          { pid: "P3", arrival: 1, burst: 2 },
+          { pid: "P4", arrival: 2, burst: 1 },
+        ],
+        [
+          { pid: "P1", arrival: 0, burst: 4 },
+          { pid: "P2", arrival: 0, burst: 6 },
+          { pid: "P3", arrival: 2, burst: 3 },
+          { pid: "P4", arrival: 3, burst: 8 },
+          { pid: "P5", arrival: 5, burst: 2 },
+        ],
+      ];
+
+      let lastExampleIdx = -1;
+
+      function loadExample() {
+        let idx;
+        if (EXAMPLE_POOLS.length > 1) {
+          do {
+            idx = Math.floor(Math.random() * EXAMPLE_POOLS.length);
+          } while (idx === lastExampleIdx);
+        } else {
+          idx = 0;
+        }
+        lastExampleIdx = idx;
+        processes = EXAMPLE_POOLS[idx].map((p) => ({ ...p }));
+        renderQueue();
+        hideResults();
+      }
+
+      function clearProcesses() {
+        processes = [];
+        renderQueue();
+        hideResults();
+      }
+
+      function removeProcess(pid) {
+        processes = processes.filter((p) => p.pid !== pid);
+        renderQueue();
+        hideResults();
+      }
+
+      function hideResults() {
+        document.getElementById("emptyState").style.display = "flex";
+        document.getElementById("resultsContent").style.display = "none";
+      }
+
+      function renderQueue() {
+        const body = document.getElementById("queueBody");
+        body.innerHTML = "";
+
+        processes.forEach((p) => {
+          const row = document.createElement("tr");
+          [p.pid, p.arrival, p.burst].forEach((value) => {
+            const cell = document.createElement("td");
+            cell.textContent = value;
+            row.appendChild(cell);
+          });
+
+          const actionCell = document.createElement("td");
+          const button = document.createElement("button");
+          button.className = "btn btn-danger";
+          button.type = "button";
+          button.textContent = "x";
+          button.setAttribute("aria-label", "Hapus " + p.pid);
+          button.addEventListener("click", () => removeProcess(p.pid));
+          actionCell.appendChild(button);
+          row.appendChild(actionCell);
+          body.appendChild(row);
+        });
+      }
+
+      function runSimulation() {
+        if (processes.length === 0) {
+          alert("Tambahkan minimal satu proses.");
+          return;
+        }
+
+        const { ganttBlocks, results } =
+          currentAlgo === "sjf"
+            ? simulateSJF(processes)
+            : simulateSRTF(processes);
+        const avgWT =
+          results.reduce((sum, row) => sum + row.wt, 0) / results.length;
+        const avgTAT =
+          results.reduce((sum, row) => sum + row.tat, 0) / results.length;
+
+        document.getElementById("emptyState").style.display = "none";
+        document.getElementById("resultsContent").style.display = "block";
+        document.getElementById("statProcesses").textContent = processes.length;
+        document.getElementById("statAvgWT").textContent = avgWT.toFixed(2);
+        document.getElementById("statAvgTAT").textContent = avgTAT.toFixed(2);
+        document.getElementById("statAlgo").textContent =
+          currentAlgo === "sjf" ? "SJF" : "SRTF";
+
+        renderGantt(
+          ganttBlocks,
+          "ganttChart",
+          "ganttTimeline",
+          "ganttLegend",
+          true,
+        );
+        renderResultsTable(results);
+      }
+
+      function renderResultsTable(results) {
+        const body = document.getElementById("resultsBody");
+        body.innerHTML = "";
+
+        results.forEach((r) => {
+          const row = document.createElement("tr");
+          [r.pid, r.arrival, r.burst, r.ct, r.tat, r.wt].forEach(
+            (value, index) => {
+              const cell = document.createElement("td");
+              cell.textContent = value;
+              if (index === 4) {
+                cell.style.color = "var(--accent)";
+                cell.style.fontWeight = "700";
+              }
+              if (index === 5) {
+                cell.style.color = "var(--warning)";
+                cell.style.fontWeight = "700";
+              }
+              row.appendChild(cell);
+            },
+          );
+          body.appendChild(row);
+        });
+      }
+
+      function renderGantt(blocks, chartId, timelineId, legendId, animate) {
+        const chart = document.getElementById(chartId);
+        const timeline = document.getElementById(timelineId);
+        const legend = legendId ? document.getElementById(legendId) : null;
+        if (!chart || !timeline || !blocks.length) return;
+
+        chart.innerHTML = "";
+        timeline.innerHTML = "";
+        if (legend) legend.innerHTML = "";
+
+        chart.classList.toggle("scanning", Boolean(animate));
+        const totalDuration = blocks[blocks.length - 1].end;
+        const pxPerUnit = Math.max(
+          36,
+          Math.min(76, 720 / Math.max(totalDuration, 1)),
+        );
+        const width = totalDuration * pxPerUnit;
+        chart.style.width = width + "px";
+        timeline.style.width = width + "px";
+
+        blocks.forEach((block, index) => {
+          const div = document.createElement("div");
+          div.className = "gantt-block" + (block.pid === "Idle" ? " idle" : "");
+          div.style.flex =
+            "0 0 " + Math.max((block.end - block.start) * pxPerUnit, 30) + "px";
+          div.style.animationDelay = 0.08 + index * 0.08 + "s";
+          if (block.pid !== "Idle") div.style.background = getColor(block.pid);
+          div.textContent = block.pid;
+          chart.appendChild(div);
+        });
+
+        for (let t = 0; t <= totalDuration; t += 1) {
+          const tick = document.createElement("div");
+          tick.className = "tick";
+          tick.style.left = t * pxPerUnit + "px";
+          tick.textContent = t;
+          timeline.appendChild(tick);
+        }
+
+        if (legend) {
+          [
+            ...new Set(
+              blocks
+                .filter((block) => block.pid !== "Idle")
+                .map((block) => block.pid),
+            ),
+          ].forEach((pid) => {
+            const item = document.createElement("div");
+            const swatch = document.createElement("div");
+            const label = document.createElement("span");
+            item.className = "legend-item";
+            swatch.className = "legend-swatch";
+            swatch.style.background = getColor(pid);
+            label.textContent = pid;
+            item.append(swatch, label);
+            legend.appendChild(item);
+          });
+        }
+      }
+
+      window.addEventListener("hashchange", handleHashChange);
+      window.addEventListener("DOMContentLoaded", () => {
+        initSimulator();
+        handleHashChange();
+        renderGantt(
+          [
+            { pid: "P1", start: 0, end: 7 },
+            { pid: "P3", start: 7, end: 8 },
+            { pid: "P2", start: 8, end: 12 },
+            { pid: "P4", start: 12, end: 16 },
+          ],
+          "solution1Gantt",
+          "solution1Timeline",
+        );
+        renderGantt(
+          [
+            { pid: "P1", start: 0, end: 1 },
+            { pid: "P2", start: 1, end: 5 },
+            { pid: "P4", start: 5, end: 10 },
+            { pid: "P1", start: 10, end: 17 },
+            { pid: "P3", start: 17, end: 26 },
+          ],
+          "solution2Gantt",
+          "solution2Timeline",
+        );
+      });
+    </script>
+  </body>
+</html>
