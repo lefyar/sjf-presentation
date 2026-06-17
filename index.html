@@ -525,6 +525,7 @@
         overflow-x: auto;
         border-radius: var(--radius-card);
         padding: 20px;
+        -webkit-overflow-scrolling: touch;
       }
 
       .gantt-container h3 {
@@ -536,7 +537,6 @@
         position: relative;
         display: flex;
         min-height: var(--gantt-block-h);
-        overflow: hidden;
         border-radius: 6px;
       }
 
@@ -740,6 +740,11 @@
           grid-template-columns: 1fr;
         }
 
+        .sim-results {
+          min-width: 0;
+          overflow: hidden;
+        }
+
         .section-header {
           flex-direction: column;
           align-items: flex-start;
@@ -783,6 +788,7 @@
 
         .gantt-container {
           padding: 12px;
+          min-width: 0;
         }
 
         .ans-value {
@@ -895,7 +901,9 @@
         color: var(--text);
         cursor: pointer;
         font-size: 18px;
-        transition: background 0.2s, color 0.2s;
+        transition:
+          background 0.2s,
+          color 0.2s;
         flex-shrink: 0;
       }
 
@@ -1054,7 +1062,9 @@
         font-size: 12px;
         font-weight: 700;
         padding: 6px 14px;
-        transition: background 0.2s, color 0.2s;
+        transition:
+          background 0.2s,
+          color 0.2s;
         white-space: nowrap;
       }
 
@@ -1095,7 +1105,6 @@
         >
         <a href="#/simulator" data-page="simulator">Simulator</a>
         <a href="#/problems" data-page="problems">Latihan</a>
-        <a href="#/solutions" data-page="solutions">Solusi</a>
       </nav>
       <div class="topbar-indicator" id="pageIndicator">Materi</div>
     </header>
@@ -1115,7 +1124,9 @@
             Untuk kumpulan proses tertentu, SJF dapat menghasilkan rata-rata
             waktu tunggu yang sangat rendah.
           </p>
-          <button class="btn-learn" onclick="openModal('modal-apa-itu')">Pelajari Lebih Lanjut →</button>
+          <button class="btn-learn" onclick="openModal('modal-apa-itu')">
+            Pelajari Lebih Lanjut →
+          </button>
         </div>
         <div class="card">
           <h3>SJF Non-Preemptive</h3>
@@ -1123,7 +1134,9 @@
             Jika proses sudah berjalan, proses tersebut diselesaikan dulu sampai
             selesai. CPU baru memilih proses berikutnya saat kembali kosong.
           </p>
-          <button class="btn-learn" onclick="openModal('modal-nonpreemptive')">Pelajari Lebih Lanjut →</button>
+          <button class="btn-learn" onclick="openModal('modal-nonpreemptive')">
+            Pelajari Lebih Lanjut →
+          </button>
         </div>
         <div class="card">
           <h3>SRTF Preemptive</h3>
@@ -1132,13 +1145,17 @@
             sisa waktu eksekusi yang lebih pendek daripada proses yang sedang
             berjalan.
           </p>
-          <button class="btn-learn" onclick="openModal('modal-preemptive')">Pelajari Lebih Lanjut →</button>
+          <button class="btn-learn" onclick="openModal('modal-preemptive')">
+            Pelajari Lebih Lanjut →
+          </button>
         </div>
       </div>
 
       <div class="section-header">
         <h2>Rumus Penting</h2>
-        <button class="btn-learn" onclick="openModal('modal-rumus')">Lihat Penjelasan Rumus →</button>
+        <button class="btn-learn" onclick="openModal('modal-rumus')">
+          Lihat Penjelasan Rumus →
+        </button>
       </div>
       <div class="formula-box">
         <span class="var">Completion Time (CT)</span>
@@ -1153,7 +1170,9 @@
 
       <div class="section-header">
         <h2>Perbandingan SJF dan SRTF</h2>
-        <button class="btn-learn" onclick="openModal('modal-perbandingan')">Lihat Perbandingan Detail →</button>
+        <button class="btn-learn" onclick="openModal('modal-perbandingan')">
+          Lihat Perbandingan Detail →
+        </button>
       </div>
       <table class="styled-table comparison-table">
         <thead>
@@ -1318,7 +1337,8 @@
     <main class="page" id="page-problems">
       <h2>Latihan Soal</h2>
       <p class="subtitle">
-        Kerjakan manual terlebih dahulu, lalu cocokkan dengan halaman solusi.
+        Kerjakan soal-soal berikut untuk menguji pemahamanmu tentang algoritma
+        SJF dan SRTF.
       </p>
 
       <section class="problem-card">
@@ -1597,54 +1617,129 @@
       <div class="modal">
         <div class="modal-header">
           <h2>Apa Itu Shortest Job First (SJF)?</h2>
-          <button class="modal-close" onclick="closeModal('modal-apa-itu')" aria-label="Tutup modal">&times;</button>
+          <button
+            class="modal-close"
+            onclick="closeModal('modal-apa-itu')"
+            aria-label="Tutup modal"
+          >
+            &times;
+          </button>
         </div>
         <div class="modal-body">
           <h3>Definisi</h3>
           <p>
-            <strong>Shortest Job First (SJF)</strong> adalah algoritma penjadwalan CPU yang
-            <strong>memprioritaskan proses dengan <span class="highlight">Burst Time (BT)</span> paling kecil</strong> dari antrian ready queue.
-            Algoritma ini termasuk dalam kategori <em>priority scheduling</em> di mana prioritas ditentukan oleh durasi eksekusi.
+            <strong>Shortest Job First (SJF)</strong> adalah algoritma
+            penjadwalan CPU yang
+            <strong
+              >memprioritaskan proses dengan
+              <span class="highlight">Burst Time (BT)</span> paling
+              kecil</strong
+            >
+            dari antrian ready queue. Algoritma ini termasuk dalam kategori
+            <em>priority scheduling</em> di mana prioritas ditentukan oleh
+            durasi eksekusi.
           </p>
 
           <h3>Kenapa SJF Efektif?</h3>
-          <p>SJF <strong>terbukti optimal</strong> untuk meminimalkan rata-rata waiting time pada kumpulan proses tertentu. Ini dapat dibuktikan secara matematis — mengerjakan pekerjaan pendek lebih dulu akan membuat pekerjaan panjang menunggu, tetapi total akumulasi waktu tunggu menjadi paling kecil.</p>
+          <p>
+            SJF <strong>terbukti optimal</strong> untuk meminimalkan rata-rata
+            waiting time pada kumpulan proses tertentu. Ini dapat dibuktikan
+            secara matematis — mengerjakan pekerjaan pendek lebih dulu akan
+            membuat pekerjaan panjang menunggu, tetapi total akumulasi waktu
+            tunggu menjadi paling kecil.
+          </p>
 
           <div class="info-callout">
-            <strong>Intuisi:</strong> Seperti antrian di kasir — jika orang dengan belanjaan sedikit dilayani lebih dulu, maka rata-rata waktu tunggu semua orang di antrian menjadi lebih rendah.
+            <strong>Intuisi:</strong> Seperti antrian di kasir — jika orang
+            dengan belanjaan sedikit dilayani lebih dulu, maka rata-rata waktu
+            tunggu semua orang di antrian menjadi lebih rendah.
           </div>
 
           <h3>Dua Varian SJF</h3>
           <ul>
-            <li><strong>SJF Non-Preemptive:</strong> Sekali proses mulai dieksekusi, proses tersebut tidak bisa diinterupsi sampai selesai. CPU idle hanya saat tidak ada proses yang siap.</li>
-            <li><strong>SRTF (Shortest Remaining Time First) / SJF Preemptive:</strong> Jika ada proses baru dengan sisa burst time lebih kecil dari proses yang sedang berjalan, CPU akan beralih (preempt) ke proses baru tersebut.</li>
+            <li>
+              <strong>SJF Non-Preemptive:</strong> Sekali proses mulai
+              dieksekusi, proses tersebut tidak bisa diinterupsi sampai selesai.
+              CPU idle hanya saat tidak ada proses yang siap.
+            </li>
+            <li>
+              <strong
+                >SRTF (Shortest Remaining Time First) / SJF Preemptive:</strong
+              >
+              Jika ada proses baru dengan sisa burst time lebih kecil dari
+              proses yang sedang berjalan, CPU akan beralih (preempt) ke proses
+              baru tersebut.
+            </li>
           </ul>
 
           <h3>Karakteristik Utama</h3>
           <table class="mini-table">
-            <thead><tr><th>Properti</th><th>Penjelasan</th></tr></thead>
+            <thead>
+              <tr>
+                <th>Properti</th>
+                <th>Penjelasan</th>
+              </tr>
+            </thead>
             <tbody>
-              <tr><td>Jenis</td><td>Non-Preemptive atau Preemptive</td></tr>
-              <tr><td>Kriteria Seleksi</td><td>Burst time terkecil</td></tr>
-              <tr><td>Optimalitas</td><td>Optimal untuk rata-rata waiting time minimum</td></tr>
-              <tr><td>Kebutuhan</td><td>Harus tahu burst time di awal (sulit di sistem nyata)</td></tr>
-              <tr><td>Risiko</td><td>Starvation pada proses dengan burst time besar</td></tr>
+              <tr>
+                <td>Jenis</td>
+                <td>Non-Preemptive atau Preemptive</td>
+              </tr>
+              <tr>
+                <td>Kriteria Seleksi</td>
+                <td>Burst time terkecil</td>
+              </tr>
+              <tr>
+                <td>Optimalitas</td>
+                <td>Optimal untuk rata-rata waiting time minimum</td>
+              </tr>
+              <tr>
+                <td>Kebutuhan</td>
+                <td>Harus tahu burst time di awal (sulit di sistem nyata)</td>
+              </tr>
+              <tr>
+                <td>Risiko</td>
+                <td>Starvation pada proses dengan burst time besar</td>
+              </tr>
             </tbody>
           </table>
 
           <h3>Contoh Sederhana</h3>
           <p>Misal ada tiga proses:</p>
           <table class="mini-table">
-            <thead><tr><th>Proses</th><th>Burst Time</th></tr></thead>
+            <thead>
+              <tr>
+                <th>Proses</th>
+                <th>Burst Time</th>
+              </tr>
+            </thead>
             <tbody>
-              <tr><td>P1</td><td>6</td></tr>
-              <tr><td>P2</td><td>8</td></tr>
-              <tr><td>P3</td><td>3</td></tr>
+              <tr>
+                <td>P1</td>
+                <td>6</td>
+              </tr>
+              <tr>
+                <td>P2</td>
+                <td>8</td>
+              </tr>
+              <tr>
+                <td>P3</td>
+                <td>3</td>
+              </tr>
             </tbody>
           </table>
-          <p>Urutan SJF: <span class="highlight">P3 → P1 → P2</span> (burst terkecil dulu).</p>
-          <p>Jika dikerjakan dalam urutan datang (FCFS): P1(0-6), P2(6-14), P3(14-17) → rata WT = (0 + 6 + 14)/3 = <strong>6.67</strong></p>
-          <p>Dengan SJF: P3(0-3), P1(3-9), P2(9-17) → rata WT = (3 + 9 + 0)/3 = <strong>4.00</strong> ← lebih kecil!</p>
+          <p>
+            Urutan SJF: <span class="highlight">P3 → P1 → P2</span> (burst
+            terkecil dulu).
+          </p>
+          <p>
+            Jika dikerjakan dalam urutan datang (FCFS): P1(0-6), P2(6-14),
+            P3(14-17) → rata WT = (0 + 6 + 14)/3 = <strong>6.67</strong>
+          </p>
+          <p>
+            Dengan SJF: P3(0-3), P1(3-9), P2(9-17) → rata WT = (3 + 9 + 0)/3 =
+            <strong>4.00</strong> ← lebih kecil!
+          </p>
         </div>
       </div>
     </div>
@@ -1653,23 +1748,49 @@
       <div class="modal">
         <div class="modal-header">
           <h2>SJF Non-Preemptive — Detail</h2>
-          <button class="modal-close" onclick="closeModal('modal-nonpreemptive')" aria-label="Tutup modal">&times;</button>
+          <button
+            class="modal-close"
+            onclick="closeModal('modal-nonpreemptive')"
+            aria-label="Tutup modal"
+          >
+            &times;
+          </button>
         </div>
         <div class="modal-body">
           <h3>Cara Kerja</h3>
-          <p>Pada SJF Non-Preemptive, <strong>CPU tidak bisa merebut proses yang sedang berjalan</strong>. Keputusan penjadwalan hanya diambil saat:</p>
+          <p>
+            Pada SJF Non-Preemptive,
+            <strong>CPU tidak bisa merebut proses yang sedang berjalan</strong>.
+            Keputusan penjadwalan hanya diambil saat:
+          </p>
           <ul>
-            <li>CPU sedang <strong>idle</strong> (tidak ada proses yang berjalan)</li>
+            <li>
+              CPU sedang <strong>idle</strong> (tidak ada proses yang berjalan)
+            </li>
             <li>Sebuah proses <strong>baru saja selesai</strong> dieksekusi</li>
           </ul>
 
           <h3>Algoritma Langkah demi Langkah</h3>
           <ol>
-            <li>Saat CPU kosong, lihat semua proses yang <strong>sudah datang</strong> (arrival time ≤ waktu saat ini).</li>
-            <li>Pilih proses dengan <strong>burst time terkecil</strong> di antara yang sudah datang.</li>
-            <li>Jika ada dua proses dengan burst time sama, pilih yang <strong>datang lebih dulu</strong> (FCFS sebagai tie-breaker).</li>
-            <li>Jalankan proses tersebut <strong>sampai selesai</strong> — tidak boleh diinterupsi.</li>
-            <li>Update waktu, tandai proses selesai, lalu ulangi dari langkah 1.</li>
+            <li>
+              Saat CPU kosong, lihat semua proses yang
+              <strong>sudah datang</strong> (arrival time ≤ waktu saat ini).
+            </li>
+            <li>
+              Pilih proses dengan <strong>burst time terkecil</strong> di antara
+              yang sudah datang.
+            </li>
+            <li>
+              Jika ada dua proses dengan burst time sama, pilih yang
+              <strong>datang lebih dulu</strong> (FCFS sebagai tie-breaker).
+            </li>
+            <li>
+              Jalankan proses tersebut <strong>sampai selesai</strong> — tidak
+              boleh diinterupsi.
+            </li>
+            <li>
+              Update waktu, tandai proses selesai, lalu ulangi dari langkah 1.
+            </li>
           </ol>
 
           <h3>Ilustrasi Eksekusi</h3>
@@ -1686,8 +1807,11 @@
           </div>
 
           <div class="info-callout">
-            <strong>Kelebihan:</strong> Sederhana diimplementasikan, overhead context switching rendah karena tidak ada preemption.<br><br>
-            <strong>Kekurangan:</strong> Proses dengan burst time besar bisa mengalami <strong>starvation</strong> (menunggu sangat lama) jika terus-menerus ada proses pendek baru yang datang.
+            <strong>Kelebihan:</strong> Sederhana diimplementasikan, overhead
+            context switching rendah karena tidak ada preemption.<br /><br />
+            <strong>Kekurangan:</strong> Proses dengan burst time besar bisa
+            mengalami <strong>starvation</strong> (menunggu sangat lama) jika
+            terus-menerus ada proses pendek baru yang datang.
           </div>
         </div>
       </div>
@@ -1697,20 +1821,41 @@
       <div class="modal">
         <div class="modal-header">
           <h2>SRTF (Preemptive SJF) — Detail</h2>
-          <button class="modal-close" onclick="closeModal('modal-preemptive')" aria-label="Tutup modal">&times;</button>
+          <button
+            class="modal-close"
+            onclick="closeModal('modal-preemptive')"
+            aria-label="Tutup modal"
+          >
+            &times;
+          </button>
         </div>
         <div class="modal-body">
           <h3>Cara Kerja</h3>
           <p>
-            <strong>Shortest Remaining Time First (SRTF)</strong> adalah versi preemptive dari SJF. CPU <strong>dapat menginterupsi</strong> proses yang sedang berjalan jika ada proses baru dengan <strong>remaining time (sisa burst time) yang lebih kecil</strong>.
+            <strong>Shortest Remaining Time First (SRTF)</strong> adalah versi
+            preemptive dari SJF. CPU <strong>dapat menginterupsi</strong> proses
+            yang sedang berjalan jika ada proses baru dengan
+            <strong>remaining time (sisa burst time) yang lebih kecil</strong>.
           </p>
 
           <h3>Algoritma Langkah demi Langkah</h3>
           <ol>
-            <li>Setiap satuan waktu, periksa <strong>semua proses yang sudah datang</strong> dan belum selesai.</li>
-            <li>Hitung <strong>remaining time</strong> = burst time - waktu yang sudah dijalankan.</li>
-            <li>Pilih proses dengan <strong>remaining time terkecil</strong> untuk dijalankan pada waktu berikutnya.</li>
-            <li>Jika proses yang terpilih berbeda dengan yang sedang berjalan, lakukan <strong>context switch</strong> (preemption).</li>
+            <li>
+              Setiap satuan waktu, periksa
+              <strong>semua proses yang sudah datang</strong> dan belum selesai.
+            </li>
+            <li>
+              Hitung <strong>remaining time</strong> = burst time - waktu yang
+              sudah dijalankan.
+            </li>
+            <li>
+              Pilih proses dengan <strong>remaining time terkecil</strong> untuk
+              dijalankan pada waktu berikutnya.
+            </li>
+            <li>
+              Jika proses yang terpilih berbeda dengan yang sedang berjalan,
+              lakukan <strong>context switch</strong> (preemption).
+            </li>
             <li>Ulangi setiap satuan waktu sampai semua proses selesai.</li>
           </ol>
 
@@ -1728,14 +1873,28 @@
           </div>
 
           <div class="info-callout">
-            <strong>Kelebihan:</strong> Memberikan rata-rata waiting time yang <strong>paling optimal</strong> di antara semua algoritma penjadwalan. Lebih responsif untuk sistem interaktif.<br><br>
-            <strong>Kekurangan:</strong> <strong>Overhead context switching tinggi</strong> karena preemption bisa terjadi sangat sering. Lebih kompleks diimplementasikan. Starvation tetap mungkin terjadi.
+            <strong>Kelebihan:</strong> Memberikan rata-rata waiting time yang
+            <strong>paling optimal</strong> di antara semua algoritma
+            penjadwalan. Lebih responsif untuk sistem interaktif.<br /><br />
+            <strong>Kekurangan:</strong>
+            <strong>Overhead context switching tinggi</strong> karena preemption
+            bisa terjadi sangat sering. Lebih kompleks diimplementasikan.
+            Starvation tetap mungkin terjadi.
           </div>
 
           <h3>Contoh Perbandingan</h3>
-          <p>Proses: P1(AT=0, BT=8), P2(AT=1, BT=4), P3(AT=2, BT=9), P4(AT=3, BT=5)</p>
-          <p><strong>SJF Non-Preemptive:</strong> P1(0-8) → P2(8-12) → P4(12-17) → P3(17-26) — urutan tetap.</p>
-          <p><strong>SRTF:</strong> P1(0-1) → P2(1-5) → P4(5-10) → P1(10-17) → P3(17-26) — P1 di-preempt oleh P2!</p>
+          <p>
+            Proses: P1(AT=0, BT=8), P2(AT=1, BT=4), P3(AT=2, BT=9), P4(AT=3,
+            BT=5)
+          </p>
+          <p>
+            <strong>SJF Non-Preemptive:</strong> P1(0-8) → P2(8-12) → P4(12-17)
+            → P3(17-26) — urutan tetap.
+          </p>
+          <p>
+            <strong>SRTF:</strong> P1(0-1) → P2(1-5) → P4(5-10) → P1(10-17) →
+            P3(17-26) — P1 di-preempt oleh P2!
+          </p>
         </div>
       </div>
     </div>
@@ -1744,54 +1903,123 @@
       <div class="modal">
         <div class="modal-header">
           <h2>Rumus & Perhitungan SJF</h2>
-          <button class="modal-close" onclick="closeModal('modal-rumus')" aria-label="Tutup modal">&times;</button>
+          <button
+            class="modal-close"
+            onclick="closeModal('modal-rumus')"
+            aria-label="Tutup modal"
+          >
+            &times;
+          </button>
         </div>
         <div class="modal-body">
           <h3>1. Completion Time (CT)</h3>
-          <p>Waktu saat sebuah proses <strong>selesai dieksekusi</strong>. Diperoleh dari penelusuran Gantt chart.</p>
+          <p>
+            Waktu saat sebuah proses <strong>selesai dieksekusi</strong>.
+            Diperoleh dari penelusuran Gantt chart.
+          </p>
           <div class="formula-inline">
             <span class="em">CT</span> = waktu selesai pada Gantt chart
           </div>
 
           <h3>2. Turnaround Time (TAT)</h3>
-          <p>Total waktu sejak proses <strong>datang</strong> hingga <strong>selesai</strong>. Mencakup waiting time + execution time.</p>
+          <p>
+            Total waktu sejak proses <strong>datang</strong> hingga
+            <strong>selesai</strong>. Mencakup waiting time + execution time.
+          </p>
           <div class="formula-inline">
             <span class="em">TAT</span> = CT − AT = WT + BT
           </div>
-          <p>Semakin kecil TAT, semakin cepat proses diselesaikan sejak kedatangannya.</p>
+          <p>
+            Semakin kecil TAT, semakin cepat proses diselesaikan sejak
+            kedatangannya.
+          </p>
 
           <h3>3. Waiting Time (WT)</h3>
-          <p>Total waktu proses <strong>menunggu di ready queue</strong> sebelum dan selama eksekusi (tidak termasuk waktu eksekusi).</p>
+          <p>
+            Total waktu proses <strong>menunggu di ready queue</strong> sebelum
+            dan selama eksekusi (tidak termasuk waktu eksekusi).
+          </p>
           <div class="formula-inline">
             <span class="em">WT</span> = TAT − BT
           </div>
 
           <h3>4. Response Time (RT) — Konsep Tambahan</h3>
-          <p>Waktu sejak proses datang sampai <strong>pertama kali</strong> mendapat CPU. Relevan untuk sistem interaktif.</p>
+          <p>
+            Waktu sejak proses datang sampai
+            <strong>pertama kali</strong> mendapat CPU. Relevan untuk sistem
+            interaktif.
+          </p>
           <div class="formula-inline">
             <span class="em">RT</span> = waktu mulai pertama − AT
           </div>
 
           <h3>5. Rata-rata</h3>
           <div class="formula-inline">
-            <span class="em">Rata-rata WT</span> = Σ WT / N &nbsp;&nbsp;|&nbsp;&nbsp; <span class="em">Rata-rata TAT</span> = Σ TAT / N
+            <span class="em">Rata-rata WT</span> = Σ WT / N
+            &nbsp;&nbsp;|&nbsp;&nbsp; <span class="em">Rata-rata TAT</span> = Σ
+            TAT / N
           </div>
 
           <h3>Contoh Perhitungan Manual</h3>
           <table class="mini-table">
-            <thead><tr><th>PID</th><th>AT</th><th>BT</th><th>CT</th><th>TAT</th><th>WT</th></tr></thead>
+            <thead>
+              <tr>
+                <th>PID</th>
+                <th>AT</th>
+                <th>BT</th>
+                <th>CT</th>
+                <th>TAT</th>
+                <th>WT</th>
+              </tr>
+            </thead>
             <tbody>
-              <tr><td>P1</td><td>0</td><td>7</td><td>7</td><td>7 - 0 = 7</td><td>7 - 7 = 0</td></tr>
-              <tr><td>P2</td><td>2</td><td>4</td><td>12</td><td>12 - 2 = 10</td><td>10 - 4 = 6</td></tr>
-              <tr><td>P3</td><td>4</td><td>1</td><td>8</td><td>8 - 4 = 4</td><td>4 - 1 = 3</td></tr>
-              <tr><td>P4</td><td>5</td><td>4</td><td>16</td><td>16 - 5 = 11</td><td>11 - 4 = 7</td></tr>
+              <tr>
+                <td>P1</td>
+                <td>0</td>
+                <td>7</td>
+                <td>7</td>
+                <td>7 - 0 = 7</td>
+                <td>7 - 7 = 0</td>
+              </tr>
+              <tr>
+                <td>P2</td>
+                <td>2</td>
+                <td>4</td>
+                <td>12</td>
+                <td>12 - 2 = 10</td>
+                <td>10 - 4 = 6</td>
+              </tr>
+              <tr>
+                <td>P3</td>
+                <td>4</td>
+                <td>1</td>
+                <td>8</td>
+                <td>8 - 4 = 4</td>
+                <td>4 - 1 = 3</td>
+              </tr>
+              <tr>
+                <td>P4</td>
+                <td>5</td>
+                <td>4</td>
+                <td>16</td>
+                <td>16 - 5 = 11</td>
+                <td>11 - 4 = 7</td>
+              </tr>
             </tbody>
           </table>
-          <p><strong>Rata-rata WT</strong> = (0 + 6 + 3 + 7) / 4 = <span class="highlight">4.00</span></p>
-          <p><strong>Rata-rata TAT</strong> = (7 + 10 + 4 + 11) / 4 = <span class="highlight">8.00</span></p>
+          <p>
+            <strong>Rata-rata WT</strong> = (0 + 6 + 3 + 7) / 4 =
+            <span class="highlight">4.00</span>
+          </p>
+          <p>
+            <strong>Rata-rata TAT</strong> = (7 + 10 + 4 + 11) / 4 =
+            <span class="highlight">8.00</span>
+          </p>
 
           <div class="info-callout">
-            <strong>Tips:</strong> Selalu gambar Gantt chart dulu, lalu isi CT dari chart, baru hitung TAT dan WT. Ini mengurangi risiko salah hitung.
+            <strong>Tips:</strong> Selalu gambar Gantt chart dulu, lalu isi CT
+            dari chart, baru hitung TAT dan WT. Ini mengurangi risiko salah
+            hitung.
           </div>
         </div>
       </div>
@@ -1801,40 +2029,102 @@
       <div class="modal">
         <div class="modal-header">
           <h2>Perbandingan SJF vs SRTF — Detail Lengkap</h2>
-          <button class="modal-close" onclick="closeModal('modal-perbandingan')" aria-label="Tutup modal">&times;</button>
+          <button
+            class="modal-close"
+            onclick="closeModal('modal-perbandingan')"
+            aria-label="Tutup modal"
+          >
+            &times;
+          </button>
         </div>
         <div class="modal-body">
           <h3>Tabel Perbandingan</h3>
           <table class="mini-table">
-            <thead><tr><th>Aspek</th><th>SJF Non-Preemptive</th><th>SRTF Preemptive</th></tr></thead>
+            <thead>
+              <tr>
+                <th>Aspek</th>
+                <th>SJF Non-Preemptive</th>
+                <th>SRTF Preemptive</th>
+              </tr>
+            </thead>
             <tbody>
-              <tr><td>Preemption</td><td>Tidak ada</td><td>Ada (bisa di-interrupt)</td></tr>
-              <tr><td>Context Switch</td><td>Minimal (hanya saat proses selesai)</td><td>Sering (setiap ada proses lebih pendek)</td></tr>
-              <tr><td>Overhead</td><td>Rendah</td><td>Tinggi</td></tr>
-              <tr><td>Rata-rata WT</td><td>Rendah, tapi bisa lebih tinggi dari SRTF</td><td>Paling optimal secara teoritis</td></tr>
-              <tr><td>Implementasi</td><td>Sederhana</td><td>Kompleks</td></tr>
-              <tr><td>Cocok untuk</td><td>Sistem batch, background jobs</td><td>Sistem real-time, interaktif</td></tr>
-              <tr><td>Starvation</td><td>Mungkin pada proses panjang</td><td>Mungkin, tapi lebih kecil kemungkinannya</td></tr>
-              <tr><td>Prediksi BT</td><td>Dibutuhkan (sulit di sistem nyata)</td><td>Dibutuhkan (sulit di sistem nyata)</td></tr>
+              <tr>
+                <td>Preemption</td>
+                <td>Tidak ada</td>
+                <td>Ada (bisa di-interrupt)</td>
+              </tr>
+              <tr>
+                <td>Context Switch</td>
+                <td>Minimal (hanya saat proses selesai)</td>
+                <td>Sering (setiap ada proses lebih pendek)</td>
+              </tr>
+              <tr>
+                <td>Overhead</td>
+                <td>Rendah</td>
+                <td>Tinggi</td>
+              </tr>
+              <tr>
+                <td>Rata-rata WT</td>
+                <td>Rendah, tapi bisa lebih tinggi dari SRTF</td>
+                <td>Paling optimal secara teoritis</td>
+              </tr>
+              <tr>
+                <td>Implementasi</td>
+                <td>Sederhana</td>
+                <td>Kompleks</td>
+              </tr>
+              <tr>
+                <td>Cocok untuk</td>
+                <td>Sistem batch, background jobs</td>
+                <td>Sistem real-time, interaktif</td>
+              </tr>
+              <tr>
+                <td>Starvation</td>
+                <td>Mungkin pada proses panjang</td>
+                <td>Mungkin, tapi lebih kecil kemungkinannya</td>
+              </tr>
+              <tr>
+                <td>Prediksi BT</td>
+                <td>Dibutuhkan (sulit di sistem nyata)</td>
+                <td>Dibutuhkan (sulit di sistem nyata)</td>
+              </tr>
             </tbody>
           </table>
 
           <h3>Kapan Menggunakan SJF Non-Preemptive?</h3>
           <ul>
-            <li>Sistem <strong>batch processing</strong> di mana semua job sudah diketahui di awal</li>
-            <li>Lingkungan dengan <strong>overhead context switch yang mahal</strong></li>
+            <li>
+              Sistem <strong>batch processing</strong> di mana semua job sudah
+              diketahui di awal
+            </li>
+            <li>
+              Lingkungan dengan
+              <strong>overhead context switch yang mahal</strong>
+            </li>
             <li>Sistem embedded sederhana dengan jumlah proses terbatas</li>
           </ul>
 
           <h3>Kapan Menggunakan SRTF?</h3>
           <ul>
-            <li>Sistem <strong>interaktif</strong> yang membutuhkan respons cepat</li>
-            <li>Sistem <strong>time-sharing</strong> di mana pengguna mengharapkan responsivitas</li>
-            <li>Ketika <strong>rata-rata waiting time minimal</strong> adalah prioritas utama</li>
+            <li>
+              Sistem <strong>interaktif</strong> yang membutuhkan respons cepat
+            </li>
+            <li>
+              Sistem <strong>time-sharing</strong> di mana pengguna mengharapkan
+              responsivitas
+            </li>
+            <li>
+              Ketika <strong>rata-rata waiting time minimal</strong> adalah
+              prioritas utama
+            </li>
           </ul>
 
           <div class="info-callout">
-            <strong>Kesimpulan:</strong> SRTF memberikan hasil <strong>paling optimal</strong> untuk rata-rata waiting time, tetapi dengan biaya overhead yang lebih tinggi. SJF Non-Preemptive adalah pilihan yang baik ketika overhead context switch perlu diminimalkan dan prediktabilitas lebih penting daripada optimalitas absolut.
+            <strong>Kesimpulan:</strong> SRTF memberikan hasil
+            <strong>paling optimal</strong> untuk rata-rata waiting time, tetapi
+            dengan biaya overhead yang lebih tinggi. SJF Non-Preemptive adalah
+            pilihan yang baik ketika overhead context switch perlu diminimalkan
+            dan prediktabilitas lebih penting daripada optimalitas absolut.
           </div>
         </div>
       </div>
@@ -1861,7 +2151,10 @@
 
       // Close modal on overlay click (click outside modal box)
       document.addEventListener("click", function (e) {
-        if (e.target.classList.contains("modal-overlay") && e.target.classList.contains("open")) {
+        if (
+          e.target.classList.contains("modal-overlay") &&
+          e.target.classList.contains("open")
+        ) {
           closeModal(e.target.id);
         }
       });
